@@ -84,7 +84,8 @@ park_data_marseille = {
     "Parc Émile Duclaux": 1873,
     "Jardin de la Colline Puget":1872,
     "Place du Général-de-Gaulle":1778,
-    "Parc de la Buzine":"early 21st century"
+    "Parc de la Buzine":"early 21st century",
+    "Parc de la Porte d'Aix": 2022
     
 }
 
@@ -159,5 +160,53 @@ for park_name, year_built in park_data_marseille.items():
                 popup=popup_content,
                 icon=folium.Icon(color=color, icon='tree-deciduous')
             ).add_to(map_combined)
+            
+#%%
+
+place_data = {
+    "Square Alexandre Labadie": "Jardin public",
+    "Cours Belsunce":"Plantations d'accompagnement",
+    "Place Jules Guesde":"Jardin public",
+    "Fontaine Place de Strasbourg":"Place public",
+    "Jardin des Archives Départementales":"Jardin public",
+    "Maternité Belle de Mai":"Jardin de Quartier",
+
+}
+
+marseille_latitude_range = (43.2,43.45)
+marseille_longitude_range = (5.25, 5.5)
+
+
+
+color_mapping = {
+    "Jardin public": "purple",
+    "Plantations d'accompagnement": "pink",
+    "Place public": "orange",
+    "Jardin de Quartier": "darkpurple",
+}
+
+for park_name, park_type in place_data.items():
+    location = park_name
+    test_loc = geolocator.geocode(location)
+    
+    if test_loc is not None:
+        latitude = round(test_loc.latitude, 5)
+        longitude = round(test_loc.longitude, 5)
+        
+        # Check if the geocoded location is within Marseille boundaries
+        if (
+            marseille_latitude_range[0] <= latitude <= marseille_latitude_range[1] and
+            marseille_longitude_range[0] <= longitude <= marseille_longitude_range[1]
+        ):
+            color = color_mapping.get(park_type, "gray")  # Default to gray for unknown types
+            
+            popup_content = f"<b>{park_name}</b><br>Type: {park_type}<br>Coordinates: {latitude}, {longitude}"
+            
+            folium.Marker(
+                location=[test_loc.latitude, test_loc.longitude],
+                popup=popup_content,
+                icon=folium.Icon(color=color, icon='tree-conifer')
+            ).add_to(map_combined)
+
 
 map_combined.save("MergedMap.html")
